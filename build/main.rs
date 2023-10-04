@@ -5,16 +5,32 @@ use api::Api;
 
 const RAYLIB_API_PATH: &str = "raylib/parser/output/raylib_api.json";
 
+fn is_web_build() -> bool {
+    let target = std::env::var("TARGET").expect("TARGET is always set in the build script");
+
+    target.contains("wasm32")
+}
+
 fn build_raylib() {
-    let dest = cmake::Config::new("raylib")
+    let mut builder = cmake::Config::new("raylib");
+
+    builder
         .define("BUILD_EXAMPLES", "OFF")
         .define("CMAKE_BUILD_TYPE", "Release")
         .profile(if cfg!(debug_assertions) {
             "Debug"
         } else {
             "Release"
-        })
-        .build();
+        });
+
+    if is_web_build() {
+        builder
+            .define("PLATFORM", "Web")
+            // NOTE: This doesn't actually do anything, but prevents emcc from breaking somehow?
+            .define("CMAKE_C_FLAGS", "");
+    }
+
+    let dest = builder.build();
 
     println!(
         "cargo:rustc-link-search=native={}",
@@ -28,6 +44,16 @@ fn build_raylib() {
         "cargo:rustc-link-search=native={}",
         dest.join("lib32").display()
     );
+
+    if is_web_build() {
+        println!("cargo:rustc-link-lib=dylib=glfw");
+        println!("cargo:rustc-link-lib=dylib=raylib");
+
+        // INFO: early return because other platform checks will
+        // detect the OS that is being used to build the
+        // wasm code, and link the wrong libraries.
+        return;
+    }
 
     if cfg!(windows) {
         println!("cargo:rustc-link-lib=dylib=winmm");
