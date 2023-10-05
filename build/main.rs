@@ -17,6 +17,7 @@ fn build_raylib() {
     builder
         .define("BUILD_EXAMPLES", "OFF")
         .define("CMAKE_BUILD_TYPE", "Release")
+        .generator("Ninja")
         .profile(if cfg!(debug_assertions) {
             "Debug"
         } else {
