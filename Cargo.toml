@@ -35,3 +35,20 @@ serde = ["dep:serde", "mint/serde"]
 # Uses a prebuilt version of the FFI bindings.
 # This saves time over building identical bindings each time.
 prebuilt_ffi = []
+
+# Allow custom cmake options
+# To use this this feature, set an environment variable called RAYLIB_CMAKE_OPTIONS
+# You can set this under the [env] key of the .cargo/config.toml in your own crate.
+#
+# Example .cargo/config.toml:
+#
+# [env]
+# RAYLIB_CMAKE_OPTIONS = "SUPPORT_SCREEN_CAPTURE=OFF SUPPORT_GIF_RECORDING=OFF"
+# # NOTE: each option is seperated by a space, and no spaces are allowed in the option itself.
+# # Also pro tip: you can use multiline strings in toml by using the triple quote syntax without
+# # it picking up the whitespace. This is useful for long cmake option lists.
+#
+# See a list of available options here: "https://github.com/raysan5/raylib/blob/master/CMakeOptions.txt"
+#
+# See "https://doc.rust-lang.org/nightly/cargo/reference/config.html#env" for more info.
+custom_cmake_options = []

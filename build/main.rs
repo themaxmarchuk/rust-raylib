@@ -31,6 +31,26 @@ fn build_raylib() {
             .define("CMAKE_C_FLAGS", "");
     }
 
+    #[cfg(feature = "custom_cmake_options")]
+    {
+        // A list of extra cmake options to define when building raylib.
+        // Separate each option with a space, but don't use spaces in the option itself.
+        // Example: "SUPPORT_SCREEN_CAPTURE=OFF SUPPORT_GIF_RECORDING=OFF"
+        let extra_options = std::env!("RAYLIB_CMAKE_OPTIONS");
+
+        for opt in extra_options.split(" ") {
+            let key_val: Vec<&str> = opt.split("=").collect();
+
+            if key_val.len() == 1 && key_val[0].is_empty() {
+                // could be a trailing space
+                continue;
+            }
+            assert!(key_val.len() == 2, "Invalid extra cmake option: '{}'", opt);
+
+            builder.define(key_val[0], key_val[1]);
+        }
+    }
+
     let dest = builder.build();
 
     println!(
