@@ -1,6 +1,8 @@
 use std::{env, fs, path::PathBuf};
 
+#[cfg(not(feature = "prebuilt_ffi"))]
 mod api;
+#[cfg(not(feature = "prebuilt_ffi"))]
 use api::Api;
 
 const RAYLIB_API_PATH: &str = "raylib/parser/output/raylib_api.json";
